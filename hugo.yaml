@@ -1,0 +1,59 @@
+baseURL: "https://example.org/"
+title: "SyncWave 🌊"
+theme: ["PaperMod"]
+defaultContentLanguage: "es"
+languageCode: "es"
+enableRobotsTXT: true
+
+# Necesario para que el buscador (Search) de PaperMod funcione
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
+languages:
+  es:
+    languageName: "Español"
+    weight: 1
+    taxonomies:
+      category: categories
+      tag: tags
+      series: series
+    menu:
+      main:
+        - name: "Posts"
+          url: "posts/"
+          weight: 1
+        - name: "Categorías"
+          url: "categories/"
+          weight: 2
+        - name: "Buscar"
+          url: "search/"
+          weight: 3
+        - name: "Sobre Nosotros"
+          url: "about/"
+          weight: 4
+
+params:
+  env: production
+  defaultTheme: auto # Cambia entre dark/light según el sistema del lector
+  ShowReadingTime: true
+  ShowShareButtons: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowWordCount: false
+  ShowToc: true # Tabla de contenidos automática en cada post
+
+  homeInfoParams:
+    Title: "¿Qué onda? Somos SyncWave 🌊"
+    Content: >
+      Arquitectura de software, Cloud, experimentos reales con IA, buen café y lo que se nos cruce por la cabeza.
+      Escrito 100% por humanos desde la trinchera técnica.
+
+  socialIcons:
+    - name: "github"
+      url: "https://github.com/"
+    - name: "linkedin"
+      url: "https://linkedin.com/"
