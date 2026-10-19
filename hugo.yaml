@@ -62,4 +62,4 @@ params:
 
 services:
   disqus:
-    shortname: disqus_ZR8NSQWS1w
+    shortname: syncwave

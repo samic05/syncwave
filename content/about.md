@@ -5,6 +5,7 @@ summary: "Quiénes somos y por qué escribimos sin bots."
 ShowToc: false
 ShowReadingTime: false
 disableShare: true
+comments: false
 ---
 
 ## ¿Qué onda con SyncWave?
