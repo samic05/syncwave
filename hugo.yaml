@@ -1,4 +1,4 @@
-baseURL: "https://example.org/"
+baseURL: "https://samic05.github.io/syncwave/"
 title: "SyncWave 🌊"
 theme: ["PaperMod"]
 defaultContentLanguage: "es"
@@ -45,6 +45,7 @@ params:
   ShowCodeCopyButtons: true
   ShowWordCount: false
   ShowToc: true # Tabla de contenidos automática en cada post
+  comments: true
 
   homeInfoParams:
     Title: "¿Qué onda? Somos SyncWave 🌊"
@@ -57,3 +58,8 @@ params:
       url: "https://github.com/"
     - name: "linkedin"
       url: "https://linkedin.com/"
+
+
+services:
+  disqus:
+    shortname: disqus_ZR8NSQWS1w

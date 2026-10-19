@@ -1,0 +1,53 @@
+{{ $disqusShortname := or site.Config.Services.Disqus.Shortname site.Params.disqus.shortname site.DisqusShortname }}
+{{ if not $disqusShortname }}
+{{ errorf "'disqus.shortname' not set in hugo.yaml (services.disqus.shortname or params.disqus.shortname)" }}
+{{ else }}
+{{ if ne .Layout "404.html" }}
+
+<div id="disqus_thread" style="margin-top: 2rem;"></div>
+
+<script>
+    window.disqus_config = function () {
+        this.page.url = "{{ .Permalink }}";
+        this.page.identifier = "{{ .RelPermalink }}";
+        this.page.title = "{{ .Title }}";
+    };
+
+    (function () {
+        var disqusShortname = "{{ $disqusShortname }}";
+        var disqusContainer = document.getElementById("disqus_thread");
+
+        function loadDisqus() {
+            if (document.getElementById("disqus-loader")) return;
+
+            var d = document, s = d.createElement("script");
+            s.id = "disqus-loader";
+            s.async = true;
+            s.src = "https://" + disqusShortname + ".disqus.com/embed.js";
+            s.setAttribute("data-timestamp", +new Date());
+            (d.head || d.body).appendChild(s);
+        }
+
+        if ("IntersectionObserver" in window && disqusContainer) {
+            var observer = new IntersectionObserver(function (entries) {
+                if (entries[0].isIntersecting) {
+                    loadDisqus();
+                    observer.disconnect();
+                }
+            }, {
+                rootMargin: "200px"
+            });
+
+            observer.observe(disqusContainer);
+        } else {
+            loadDisqus();
+        }
+    })();
+</script>
+
+<noscript>
+    Por favor activa JavaScript para ver los <a href="https://disqus.com/?ref_noscript">comentarios vía Disqus.</a>
+</noscript>
+
+{{ end }}
+{{ end }}

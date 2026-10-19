@@ -2,14 +2,16 @@
 title: "7 clases, 10 fachadas y 4 meses de onboarding: La trampa de los Nanoservicios"
 date: 2026-10-17T21:42:52-05:00
 draft: false
-authors: ["Santiago Galvis"]
+author: ["Santiago Galvis"]
 description: "Cuando picar microservicios al extremo choca contra un legado SOA y monolítico. Así se ve la deuda técnica no planeada que nadie admite en los diagramas."
 categories: ["Software Architecture"]
 tags: ["Deuda Técnica", "Nanoservicios", "Microservicios", "SOA", "Legacy"]
 series: ["Cicatrices de Arquitectura"]
 ShowToc: true
 TocOpen: false
-mermaid: true
+mermaid: false
+comments: true
+
 cover:
   image: "cover-image.jpeg"
   alt: "Ilustración de múltiples nanoservicios haciendo cuello de botella hacia un monolito antiguo"
