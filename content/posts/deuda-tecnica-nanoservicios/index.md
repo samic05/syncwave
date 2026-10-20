@@ -28,7 +28,7 @@ Lo que en teoría debía tomarnos minutos, terminó con una estimación de **8 p
 
 ### El espejismo de los "Nanoservicios" (Arriba moderno, abajo un museo)
 
-Lo que empezó como una idea para tener dominios claros, cruzó rápidamente la línea hacia "nanoservicios" anémicos hiper-fragmentados. Hacia afuera, todo el mundo vendía el proyecto como si fuera una chimba simplemente porque "estamos en la nube y usamos microservicios". Éramos la última ola tecnológica. 
+Lo que empezó como una idea para tener dominios claros, cruzó rápidamente la línea hacia "nanoservicios" anémicos hiper-fragmentados. Hacia afuera, todo el mundo vendía el proyecto como si fuera una chimba simplemente porque "estamos en la nube y usamos microservicios". Éramos la última ola tecnológica.
 
 Pero adentro del código, la realidad era oscura. Se suponía que esta capa debía funcionar como un BFF (*Backend For Frontend*): su trabajo era simplificar los llamados de los servicios de integración hacia el *front*, computar campos y hacerle la vida fácil al cliente. En la práctica, terminó siendo un pasamanos de datos glorificado.
 
@@ -70,20 +70,14 @@ En nuestro caso, el equipo ya había levantado la mano advirtiendo los síntomas
 
 ¿Qué pasaba en la realidad? Como la prioridad siempre era sacar nuevas funcionalidades para cumplir las metas del trimestre, nuestras propuestas de *refactoring* se perdían en el fondo del *backlog*. Entonces, para poder cumplir con las fechas y simplemente sobrevivir al *sprint*, terminábamos buscando atajos... es decir, creando más deuda técnica sobre la deuda que ya teníamos. Un círculo vicioso perfecto.
 
+![image](content-one.jpeg)
+
 ### El detector de humo (Para no repetir la historia)
 
 Para que un Junior o un Senior detecte a tiempo que su equipo está creando deuda técnica no planeada, les dejo mis 3 "red flags" de bolsillo:
 
-1. **La regla de los repositorios inútiles:** Si agregar un campo en la respuesta de un *endpoint* requiere tocar 3 repositorios distintos, modificar 7 clases y cruzar varios despliegues, tienes un *coupling* distribuido severo y perdiste cohesión.
-2. **El onboarding infinito:** Si a un dev nuevo le toma más de 2 meses entender un flujo transaccional porque la arquitectura está fragmentada en *delegates* y capas inútiles, la carga cognitiva ya rompió la productividad del equipo.
-3. **Escalar el front ignorando el legacy:** Si tu capa frontal es 100% nube y elástica, pero por cada *request* le pega de forma síncrona a un monolito SOA o base de datos finita que no escala al mismo ritmo, estás construyendo un castillo de naipes. Toca implementar colas.
+1. **La regla de los repositorios inútiles:** Si agregar un campo en la respuesta de un *endpoint* requiere tocar 1 o 2 repositorios, modificar 2 o 3 clases y realizar pruebas de flujos que no están relacionados con el cambio, tienes un *coupling* distribuido severo y perdiste cohesión.
+2. **El onboarding infinito:** Si a un dev nuevo le toma más de 2 semanas entender un flujo transaccional y los servicios no son semanticos, algo va mal, el codigo es como un libro, deberia ser sencillo de entender y seguir su contexto con claridad.
+3. **Escalar el front ignorando el legacy:** Si tu capa frontal es 100% nube y elástica, pero por cada *request* le pega de forma síncrona a un monolito SOA o base de datos finita que no escala al mismo ritmo, estás construyendo un castillo de naipes. Toca jugar con la Arquitectura tal vez alguinas colas.
 
-*¿Cuál ha sido ese cambio "simple" que destapó la peor deuda técnica oculta en sus equipos? ¿Cómo lograron negociar ese refactoring con Negocio sin detener la fábrica? Los leo en los comentarios.*
-
-***
-
-### 🎨 Empaque Visual y Distribución
-
-**Nano Banana Prompts:**
-*   **Portada Principal:** `[NANO BANANA PROMPT: A hyper-modern, glowing futuristic skyscraper built directly on top of ancient, crumbling stone ruins. Cyberpunk tech vibe, high contrast, representing modern nanoservices on top of a legacy monolith, technical concept art.]`
-*   **Apoyo Interno:** ``
+*¿Cuál ha sido ese cambio "simple" que destapó la peor deuda técnica oculta en sus equipos? ¿Cómo lograron negociar ese refactoring con Negocio sin detener la fábrica? Los leo en los comentarios.*  
