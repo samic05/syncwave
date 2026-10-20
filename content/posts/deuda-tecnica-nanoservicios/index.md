@@ -7,8 +7,8 @@ description: "Cuando picar microservicios al extremo choca contra un legado SOA 
 categories: ["Software Architecture"]
 tags: ["Deuda Técnica", "Nanoservicios", "Microservicios", "SOA", "Legacy"]
 series: ["Cicatrices de Arquitectura"]
-ShowToc: true
-TocOpen: false
+ShowToc: false
+TocOpen: true
 mermaid: true
 comments: true
 
@@ -33,20 +33,6 @@ Lo que empezó como una idea para tener dominios claros, cruzó rápidamente la 
 Pero adentro del código, la realidad era oscura. Se suponía que esta capa debía funcionar como un BFF (*Backend For Frontend*): su trabajo era simplificar los llamados de los servicios de integración hacia el *front*, computar campos y hacerle la vida fácil al cliente. En la práctica, terminó siendo un pasamanos de datos glorificado.
 
 ### El cuello de botella silencioso: SOA y el Monolito atrás
-
-```mermaid
-graph TD
-    App[Mobile App] -->|Request Simple| API[API Gateway]
-    API --> NS1(Nanoservicio A)
-    API --> NS2(Nanoservicio B)
-    API --> NS3(Nanoservicio C)
-    NS1 -.->|Sobrecarga| SOA[(SOA / Legacy Monolith)]
-    NS2 -.->|Cuello de Botella| SOA
-    NS3 -.->|Latencia| SOA
-    
-    style SOA fill:#e74c3c,stroke:#c0392b,stroke-width:2px,color:#fff
-    style App fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
-```
 
 Pero el verdadero cuello de botella estaba en el fondo: el monolito SOA. Para mí, eso era básicamente una caja negra. No existía el menor interés por documentar o entender qué sistema consumía qué o cómo convivían por detrás. La expectativa genérica siempre era "exponer un servicio que orqueste todo" en un centralizador de APIs para simplificar la integración. 
 
