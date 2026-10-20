@@ -9,7 +9,7 @@ tags: ["Deuda Técnica", "Nanoservicios", "Microservicios", "SOA", "Legacy"]
 series: ["Cicatrices de Arquitectura"]
 ShowToc: true
 TocOpen: false
-mermaid: false
+mermaid: true
 comments: true
 
 cover:
@@ -18,65 +18,72 @@ cover:
   caption: ""
   relative: true
 ---
+# El espejismo de los Nanoservicios: Por qué agregar un campo nos costó 8 puntos
 
 Hace un tiempo estuve a cargo de una aplicación móvil del sector bancario. Un día común y corriente, en una planeación de sprint, nos pidieron agregar un campo en un endpoint, ya que querían mostrar un poco más de información relacionada con los productos de los clientes. Para nuestra sorpresa, nos dimos cuenta de que para hacer ese cambio tan simple requeríamos modificar clases, fachadas y cruzar varios despliegues, además de realizar una **regresión agresiva** porque varios flujos dependían de las mismas líneas de código.
 
-Lo que en teoría debía tomarnos minutos, terminó con una estimación de **8 puntos**, lo cual es básicamente la mitad de la capacidad de un integrante del equipo. El PO puso el grito en el cielo, obviamente. A pesar de que yo tenía los argumentos técnicos para explicar por qué esto era así y debíamos manejarlo de esa manera debido al estado y las decisiones arquitectónicas que existían hasta ese momento, incluso para mí resultaba ilógico. ¿Cómo era posible que esta fuera nuestra realidad? Y más importante aún: **¿cómo llegamos hasta aquí?**
+Lo que en teoría debía tomarnos minutos, terminó con una estimación de **8 puntos**, lo cual es básicamente la mitad de la capacidad de un integrante del equipo. El PO puso el grito en el cielo, obviamente. Aunque tenía todos los argumentos técnicos para justificarlo frente al equipo —el *coupling* distribuido, el estado del *legacy* y las decisiones de arquitectura heredadas—, incluso para mí resultaba ilógico. ¿Cómo era posible que esta fuera nuestra realidad? Y más importante aún: **¿cómo llegamos hasta aquí?**
 
-Tesis del post: La deuda técnica más peligrosa no nace por programar rápido y mal, sino por la sobre-ingeniería no planeada.
+**La tesis es simple:** La deuda técnica más peligrosa no nace por programar rápido y mal, sino por la sobre-ingeniería no planeada.
 
-El espejismo de los "Nanoservicios" (Arriba moderno, abajo un museo)
+### El espejismo de los "Nanoservicios" (Arriba moderno, abajo un museo)
 
-[TODO - Contexto de la arquitectura "Frankenstein"]:
+Lo que empezó como una idea para tener dominios claros, cruzó rápidamente la línea hacia "nanoservicios" anémicos hiper-fragmentados. Hacia afuera, todo el mundo vendía el proyecto como si fuera una chimba simplemente porque "estamos en la nube y usamos microservicios". Éramos la última ola tecnológica. 
 
-Contar cómo empezó la fiebre de picar servicios buscando agilidad o modernidad.
+Pero adentro del código, la realidad era oscura. Se suponía que esta capa debía funcionar como un BFF (*Backend For Frontend*): su trabajo era simplificar los llamados de los servicios de integración hacia el *front*, computar campos y hacerle la vida fácil al cliente. En la práctica, terminó siendo un pasamanos de datos glorificado.
 
-De Microservicios a Nanoservicios
+### El cuello de botella silencioso: SOA y el Monolito atrás
 
-[TODO - Pérdida de cohesión]:
+```mermaid
+graph TD
+    App[Mobile App] -->|Request Simple| API[API Gateway]
+    API --> NS1(Nanoservicio A)
+    API --> NS2(Nanoservicio B)
+    API --> NS3(Nanoservicio C)
+    NS1 -.->|Sobrecarga| SOA[(SOA / Legacy Monolith)]
+    NS2 -.->|Cuello de Botella| SOA
+    NS3 -.->|Latencia| SOA
+    
+    style SOA fill:#e74c3c,stroke:#c0392b,stroke-width:2px,color:#fff
+    style App fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+```
 
-Explicar cómo se pasó la línea de microservicios con un dominio claro a "nanoservicios" anémicos donde todo está hiper-fragmentado.
+Pero el verdadero cuello de botella estaba en el fondo: el monolito SOA. Para mí, eso era básicamente una caja negra. No existía el menor interés por documentar o entender qué sistema consumía qué o cómo convivían por detrás. La expectativa genérica siempre era "exponer un servicio que orqueste todo" en un centralizador de APIs para simplificar la integración. 
 
-Qué sensación daba esto hacia afuera ("estamos en la última ola tecnológica") vs. lo que pasaba adentro del código.
+El problema de modernizar solo la fachada es la asimetría de escalabilidad: la capa externa en la nube escala infinito, pero la infraestructura *legacy* interna es finita y no reacciona a la misma velocidad. Al no tener claro el comportamiento de estos sistemas de fondo, los llamaban de forma directa y síncrona. Nadie pensó en jugar con colas, asincronismo o los trucos que los arquitectos tenemos bajo la manga para mitigar el golpe, proteger el *legacy* y dar una percepción de rendimiento óptimo sin sacrificar la mantenibilidad.
 
-El cuello de botella silencioso: SOA y el Monolito atrás
+### Cuando la bomba explota en silencio (Los síntomas reales)
 
-[TODO - Asimetría de escalabilidad]:
+Esta deuda técnica no explota un viernes a la medianoche con una alerta roja, sino que es silenciosa y cuando te das cuenta ya es tarde.
 
-Contar la realidad de lo que había en el fondo: una arquitectura SOA y monolitos que no escalaban al mismo ritmo (throughput y latency) que la capa "nueva".
+**La carga cognitiva por las nubes**
+Como la arquitectura era tan compleja e innecesariamente dividida, nadie en el equipo lograba tener en la cabeza el mapa mental completo de cómo funcionaba un flujo de inicio a fin. El *onboarding* de un dev nuevo, que en condiciones normales tomaría un par de semanas, se convertía en meses de frustración.
 
-Por qué modernizar solo la fachada crea una falsa sensación de seguridad.
+**El impuesto de las 7 clases y 10 fachadas**
+Aquí es donde sangrábamos a diario. El verdadero dolor no era la latencia de red, era tratar de hacer un simple *debug*. Un solo *request* pasaba por varios repositorios distintos y todos los microservicios tenían capas inútiles: fachadas, *delegates*, *mappers*... un montón de *boilerplate* y *coupling* distribuido por el que un dato viajaba 10 capas sin aportar ni un gramo de valor de negocio.
 
-Cuando la bomba explota en silencio (Los síntomas reales)
+### ¿Cómo se doma al monstruo? La pelea infinita: Negocio vs. Tecnología
 
-[TODO - La muerte por mil cortes]:
+Siendo 100% honestos: no hay varita mágica, y Negocio no va a parar la fábrica 6 meses para que reescribas todo de cero. Cuando te sientas con el PO a explicarle por qué una *feature* trivial ahora cuesta 8 puntos, la conversación suele volverse un callejón sin salida.
 
-Explicar que esta deuda técnica no explota un viernes a la medianoche con una alerta roja, sino que es silenciosa y cuando te das cuenta ya es tarde.
+En nuestro caso, el equipo ya había levantado la mano advirtiendo los síntomas. ¿La respuesta de Negocio? Nos pidieron un mapeo exacto de qué tocaba hacer para arreglar esa deuda. El problema de fondo es que veían la deuda técnica como un bache en la calle: lo tapas una vez y te olvidas. Lo que cuesta evangelizar del otro lado de la mesa es que **los productos tecnológicos en producción están vivos**. Si no reciben mantenimiento continuo, se vuelven obsoletos.
 
-La carga cognitiva por las nubes (De 2 semanas a 4 meses):
-[TODO: Contar cómo el onboarding de un dev nuevo pasó de tomar 2 semanas a 4 meses porque nadie logra tener el mapa mental completo del flujo].
+¿Qué pasaba en la realidad? Como la prioridad siempre era sacar nuevas funcionalidades para cumplir las metas del trimestre, nuestras propuestas de *refactoring* se perdían en el fondo del *backlog*. Entonces, para poder cumplir con las fechas y simplemente sobrevivir al *sprint*, terminábamos buscando atajos... es decir, creando más deuda técnica sobre la deuda que ya teníamos. Un círculo vicioso perfecto.
 
-El impuesto de las 7 clases y 10 fachadas:
-[TODO: Explicar el dolor del boilerplate y el coupling distribuido. Qué pasa en los pipelines y en el debugging cuando un dato viaja por 10 capas sin aportar valor].
+### El detector de humo (Para no repetir la historia)
 
-¿Cómo se doma al monstruo? La pelea infinita: Negocio vs. Tecnología
+Para que un Junior o un Senior detecte a tiempo que su equipo está creando deuda técnica no planeada, les dejo mis 3 "red flags" de bolsillo:
 
-[TODO - La trinchera real]:
+1. **La regla de los repositorios inútiles:** Si agregar un campo en la respuesta de un *endpoint* requiere tocar 3 repositorios distintos, modificar 7 clases y cruzar varios despliegues, tienes un *coupling* distribuido severo y perdiste cohesión.
+2. **El onboarding infinito:** Si a un dev nuevo le toma más de 2 meses entender un flujo transaccional porque la arquitectura está fragmentada en *delegates* y capas inútiles, la carga cognitiva ya rompió la productividad del equipo.
+3. **Escalar el front ignorando el legacy:** Si tu capa frontal es 100% nube y elástica, pero por cada *request* le pega de forma síncrona a un monolito SOA o base de datos finita que no escala al mismo ritmo, estás construyendo un castillo de naipes. Toca implementar colas.
 
-Ser 100% honestos: no hay varita mágica ni negocio va a parar 6 meses para que reescribamos todo de cero.
+*¿Cuál ha sido ese cambio "simple" que destapó la peor deuda técnica oculta en sus equipos? ¿Cómo lograron negociar ese refactoring con Negocio sin detener la fábrica? Los leo en los comentarios.*
 
-La negociación con Negocio: Cómo explicarles por qué una feature "pequeña" ahora tarda semanas y por qué hay que pagar intereses de esa deuda.
+***
 
-Decisiones técnicas para frenar la sangría: Qué hicieron (o qué hacen hoy) para empezar a consolidar, dejar de abrir servicios nuevos sin sentido y bajar la complejidad.
+### 🎨 Empaque Visual y Distribución
 
-El detector de humo de SyncWave (Para no repetir la historia)
-
-[TODO - Cierre con criterio de ingeniería]:
-
-Dejar 3 reglas de bolsillo o "red flags" para que un Junior o un Senior detecte a tiempo que su equipo está creando deuda técnica no planeada:
-
-[Red Flag 1 - Ej. sobre el número de repos/capas para un cambio simple]
-
-[Red Flag 2 - Ej. sobre el tiempo de onboarding del equipo]
-
-[Red Flag 3 - Ej. sobre escalar la capa frontal sin mirar el legacy de atrás]
+**Nano Banana Prompts:**
+*   **Portada Principal:** `[NANO BANANA PROMPT: A hyper-modern, glowing futuristic skyscraper built directly on top of ancient, crumbling stone ruins. Cyberpunk tech vibe, high contrast, representing modern nanoservices on top of a legacy monolith, technical concept art.]`
+*   **Apoyo Interno:** ``
